@@ -1,9 +1,5 @@
-"""
-TODO
-"""
 import json
 from fastapi import APIRouter
-
 from app.models.dialog import DialogRequest
 from app.models.story import StoryRequest
 
@@ -18,7 +14,7 @@ router = APIRouter()
 @router.post("/story")
 async def generate_story(request: StoryRequest):
     """
-    TODO
+    Generates a story based on the StoryRequest.
     """
 
     json_request = request.model_dump()
@@ -26,15 +22,22 @@ async def generate_story(request: StoryRequest):
 
     response = await make_request(prompt)
 
-    return {
-        "response": response
-    }
+    if isinstance(response, str):
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            return {
+                "error": "Invalid JSON response from make_request",
+                "response": response
+            }
+
+    return response 
 
 
 @router.post("/dialog")
 async def generate_dialog(request: DialogRequest):
     """
-    TODO
+    Generates a dialog based on the DialogRequest.
     """
 
     json_request = request.model_dump()
@@ -42,6 +45,13 @@ async def generate_dialog(request: DialogRequest):
 
     response = await make_request(prompt)
 
-    return {
-        "response": response
-    }
+    if isinstance(response, str):
+        try:
+            return json.loads(response)
+        except json.JSONDecodeError:
+            return {
+                "error": "Invalid JSON response from make_request",
+                "response": response
+            }
+
+    return response 
