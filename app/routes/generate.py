@@ -1,7 +1,7 @@
 """
 TODO
 """
-import json
+
 from fastapi import APIRouter
 
 from app.models.dialog import DialogRequest
@@ -11,6 +11,8 @@ from app.prompts.dialog import generate_dialog_prompt
 from app.prompts.story import generate_story_prompt
 
 from app.clients.llm import make_request
+
+from app.clients.mongo import insert_prompt
 
 router = APIRouter()
 
@@ -25,6 +27,9 @@ async def generate_story(request: StoryRequest):
     prompt = generate_story_prompt(json_request)
 
     response = await make_request(prompt)
+
+    #to do that insert user in db
+    insert_prompt(prompt, response)
 
     return {
         "response": response
@@ -41,6 +46,8 @@ async def generate_dialog(request: DialogRequest):
     prompt = generate_dialog_prompt(json_request)
 
     response = await make_request(prompt)
+
+    insert_prompt(prompt,response)
 
     return {
         "response": response
