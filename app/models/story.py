@@ -31,10 +31,10 @@ class StoryResponse(BaseModel):
     Respuesta con la historia generada dividida en partes.
     """
     title: str
-    genre: Optional[str] = None  # El género puede ser opcional si no se proporciona
-    characters: dict  # Esperamos un diccionario de personajes y sus atributos
-    setting: Optional[dict] = None  # Los ajustes pueden ser opcionales
-    story: StorySection  # Cada sección de la historia
+    genre: Optional[str] = None 
+    characters: dict 
+    setting: Optional[dict] = None 
+    story: StorySection  
 
 class StoryRequest(BaseModel):
     """
