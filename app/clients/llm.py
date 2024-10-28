@@ -42,6 +42,7 @@ async def make_request(prompt: dict, model: str = "gpt-4o-mini"):
         )
         response=response.choices[0].message.content
 
+        print(response)
         try:
             if response[:3]=="```":
                 response=response[7:-3]
