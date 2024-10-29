@@ -43,11 +43,21 @@ async def make_request(prompt: dict, model: str = "gpt-4o-mini"):
         )
         response=response.choices[0].message.content
 
-        response=format_dialog_to_json(response)
+        print(response)
+        try:
+            if response[:3]=="```":
+                response=response[7:-3]
+
+            response_json = json.loads(response)
+            return response_json
+
+        except json.JSONDecodeError as e:
+            print("Error al decodificar JSON:", e)
 
         return response
     except OpenAIError as error:
         print(f'ocurrio un error en la llamada a OpenAI: ${error}')
+
         return None
 
 
