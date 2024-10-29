@@ -156,3 +156,9 @@ cython_debug/
 
 # JetBrains
 .idea/
+
+
+
+app/models/sound.py
+app/response_see.txt
+mi_prueba.py

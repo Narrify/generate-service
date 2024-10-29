@@ -1,4 +1,10 @@
+
 import json
+
+"""
+TODO
+"""
+
 from fastapi import APIRouter
 from app.models.dialog import DialogRequest
 from app.models.story import StoryRequest, StoryResponse
@@ -7,6 +13,8 @@ from app.prompts.dialog import generate_dialog_prompt
 from app.prompts.story import generate_story_prompt
 
 from app.clients.llm import make_request
+
+from app.clients.mongo import insert_prompt
 
 router = APIRouter()
 from pydantic import ValidationError
