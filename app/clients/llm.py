@@ -1,12 +1,13 @@
 """
 TODO
 """
+import json
 import re
 
 import os
-#import json
 from dotenv import load_dotenv
 from openai import OpenAI, OpenAIError
+
 
 load_dotenv()
 
@@ -21,7 +22,7 @@ client = OpenAI(api_key=API_KEY)
 
 async def make_request(prompt: dict, model: str = "gpt-4o-mini"):
     """
-    TODO
+    Generates a response from the model, returning it as JSON if valid.
     """
 
     try:
@@ -41,24 +42,25 @@ async def make_request(prompt: dict, model: str = "gpt-4o-mini"):
             n=1,
             temperature=0.7
         )
-        response=response.choices[0].message.content
-
+        response = response.choices[0].message.content
         print(response)
-        try:
-            if response[:3]=="```":
-                response=response[7:-3]
 
+        if response[:3] == "```":
+            response = response[7:-3]
+
+        try:
             response_json = json.loads(response)
             return response_json
+        except json.JSONDecodeError:
 
-        except json.JSONDecodeError as e:
-            print("Error al decodificar JSON:", e)
+            structured_response = format_dialog_to_json(response)
+            if structured_response:
+                return {"scenes": structured_response}
+            else:
+                return {"error": "Could not parse response", "response": response}
 
-        return response
     except OpenAIError as error:
-        print(f'ocurrio un error en la llamada a OpenAI: ${error}')
-
-        return None
+        return {"error": "API call failed", "details": str(error)}
 
 
 def format_dialog_to_json(dialog_text):

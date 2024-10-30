@@ -51,7 +51,7 @@ async def generate_story(request: StoryRequest, token: str = Depends(oauth)):
 		)
 
 	user_data = user_response.json()
-	user_id = user_data.get("id")
+	user_id = user_data.get("username")
 
 	try:
 		json_request = request.model_dump()
@@ -89,17 +89,17 @@ async def generate_dialog(request: DialogRequest, token: str = Depends(oauth)):
 		)
 
 	user_data = user_response.json()
-	user_id = user_data.get("id")
+	user_id = user_data.get("username")
 
 	json_request = request.model_dump()
 	prompt = generate_dialog_prompt(json_request)
 
 	response = await make_request(prompt)
 
-	if isinstance(response, str):
+	if isinstance(response, dict):
 		try:
-			insert_record(user_id, json.loads(response))
-			return json.loads(response)
+			insert_record(user_id, response)
+			return response
 		except json.JSONDecodeError:
 			return {
 				"error": "Invalid JSON response from make_request",
