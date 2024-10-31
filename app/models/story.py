@@ -9,19 +9,19 @@ from app.models.shared import Attribute, Character
 
 
 class StorySettings(BaseModel):
-	"""
-	Pydantic model for the story settings.
-	"""
+    """
+    Pydantic model for the story settings.
+    """
 
-	size: str
-	attributes: List[Attribute]
+    size: str
+    attributes: List[Attribute]
 
 
 class StoryRequest(BaseModel):
-	"""
-	Pydantic model for the story request.
-	"""
+    """
+    Pydantic model for the story request.
+    """
 
-	title: str
-	settings: StorySettings
-	characters: List[Character]
+    title: str
+    settings: StorySettings
+    characters: List[Character]

@@ -9,19 +9,19 @@ from app.models.shared import Character
 
 
 class DialogSettings(BaseModel):
-	"""
-	Pydantic model for the settings of a dialog.
-	"""
+    """
+    Pydantic model for the settings of a dialog.
+    """
 
-	number_of_scenes: int
-	number_of_characters: int
+    number_of_scenes: int
+    number_of_characters: int
 
 
 class DialogRequest(BaseModel):
-	"""
-	Pydantic model for a dialog request.
-	"""
+    """
+    Pydantic model for a dialog request.
+    """
 
-	story: str
-	settings: DialogSettings
-	characters: List[Character]
+    story: str
+    settings: DialogSettings
+    characters: List[Character]

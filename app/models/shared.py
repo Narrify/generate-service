@@ -7,18 +7,18 @@ from pydantic import BaseModel
 
 
 class Attribute(BaseModel):
-	"""
-	Pydantic model for an attribute.
-	"""
+    """
+    Pydantic model for an attribute.
+    """
 
-	key: str
-	value: str
+    key: str
+    value: str
 
 
 class Character(BaseModel):
-	"""
-	Pydantic model for a character.
-	"""
+    """
+    Pydantic model for a character.
+    """
 
-	name: str
-	attributes: Optional[List[Attribute]] = None
+    name: str
+    attributes: Optional[List[Attribute]] = None

@@ -13,41 +13,41 @@ stories = db["stories"]
 dialogs = db["dialogs"]
 
 
-def save_story(id: str, story: dict):
-	"""
-	Save a story to the database.
-	"""
+def save_story(user_id: str, story: dict):
+    """
+    Save a story to the database.
+    """
 
-	try:
-		stories.insert_one({"id": id, **story})
-		return True
-	except PyMongoError:
-		return False
-
-
-def get_stories(id: str):
-	"""
-	Get all stories for a given id.
-	"""
-
-	return stories.find({"id": id})
+    try:
+        stories.insert_one({"id": user_id, **story})
+        return True
+    except PyMongoError:
+        return False
 
 
-def save_dialog(id: str, dialog: dict):
-	"""
-	Save a dialog to the database.
-	"""
+def get_stories(user_id: str):
+    """
+    Get all stories for a given id.
+    """
 
-	try:
-		dialogs.insert_one({"id": id, **dialog})
-		return True
-	except PyMongoError:
-		return False
+    return stories.find({"id": user_id})
 
 
-def get_dialogs(id: str):
-	"""
-	Get all dialogs for a given id.
-	"""
+def save_dialog(user_id: str, dialog: dict):
+    """
+    Save a dialog to the database.
+    """
 
-	return dialogs.find({"id": id})
+    try:
+        dialogs.insert_one({"id": user_id, **dialog})
+        return True
+    except PyMongoError:
+        return False
+
+
+def get_dialogs(user_id: str):
+    """
+    Get all dialogs for a given id.
+    """
+
+    return dialogs.find({"id": user_id})

@@ -2,32 +2,57 @@
 Main file for the FastAPI application
 """
 
-from fastapi import FastAPI, status
+from fastapi import Depends, FastAPI, status
+from fastapi.security import OAuth2PasswordBearer
 
-from app.routes.stories import router as stories_router
-from app.routes.dialogs import router as dialogs_router
-from app.routes.generate import router as generate_router
+from app.routes import generate
+
+from app.utils.validate import validate_user
 
 app = FastAPI(
-	title="Narrify | Generation API",
-	version="1.0.0"
+    title="Narrify | Generation API",
+    version="1.0.0"
 )
+
+bearer = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @app.get("/", status_code=status.HTTP_200_OK)
 async def hello_world():
-	"""
-	Root route
-	"""
+    """
+    Root route
+    """
 
-	return "Hello World"
+    return "Hello World"
 
 
-app.include_router(stories_router, prefix="/stories")
-app.include_router(dialogs_router, prefix="/dialogs")
-app.include_router(generate_router, prefix="/generate")
+@app.get("/stories")
+def get_stories(token: str = Depends(bearer)):
+    """
+    Get all stories for the user.
+    """
+
+    user = validate_user(token)
+    stories = get_stories(user["id"])
+
+    return stories
+
+
+@app.get("/dialogs")
+def get_dialogs(token: str = Depends(bearer)):
+    """
+    Get all dialogs for the user.
+    """
+
+    user = validate_user(token)
+    dialogs = get_dialogs(user["id"])
+
+    return dialogs
+
+
+app.include_router(generate.router, prefix="/generate")
 
 if __name__ == "__main__":
-	import uvicorn
+    import uvicorn
 
-	uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

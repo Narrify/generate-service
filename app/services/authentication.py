@@ -1,21 +1,26 @@
+"""
+This module contains the authentication service.
+"""
+
 from os import getenv
 from httpx import AsyncClient
 
-from fastapi import Depends, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import status
 
 USER_ENDPOINT = getenv('USER_ENDPOINT')
 
-bearer_scheme = HTTPBearer
-
 
 async def authenticate(token: str):
-	headers = {"Authorization": f"Bearer {token}"}
+    """
+    Authenticate the user.
+    """
 
-	async with AsyncClient() as client:
-		response = await client.get(f"{USER_ENDPOINT}/me", headers=headers)
+    headers = {"Authorization": f"Bearer {token}"}
 
-	if response.status_code != status.HTTP_200_OK:
-		return None
+    async with AsyncClient() as client:
+        response = await client.get(f"{USER_ENDPOINT}/me", headers=headers)
 
-	return response.json()
+    if response.status_code != status.HTTP_200_OK:
+        return None
+
+    return response.json()
