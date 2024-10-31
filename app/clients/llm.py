@@ -1,92 +1,66 @@
 """
-TODO
+This module contains the client for the OpenAI API.
 """
-import re
 
-import os
-#import json
-from dotenv import load_dotenv
+from os import getenv
+
 from openai import OpenAI, OpenAIError
 
-load_dotenv()
+from app.prompts.story import get_story_content, generate_story_prompt
+from app.prompts.dialog import get_dialog_content, generate_dialog_prompt
 
-API_KEY = os.getenv("API_KEY_OPENAI")
+from app.log import logger
+
+API_KEY = getenv("API_KEY")
 
 if API_KEY is None:
-    print("Error: La variable API_KEY_OPENAI no se ha cargado.")
+	raise ValueError("API_KEY is not set.")
 
+logger.info("API_KEY is set.")
 
 client = OpenAI(api_key=API_KEY)
 
 
-async def make_request(prompt: dict, model: str = "gpt-4o-mini"):
-    """
-    TODO
-    """
+def make_request(content: str, prompt: str, model: str = "gpt-4o-mini"):
+	"""
+	Makes a request to the OpenAI API.
+	"""
 
-    try:
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a dialog and story generator for videogames."
-                },
-                {
-                    "role": "user",
-                    "content": prompt
-                }
-            ],
-            max_tokens=750,
-            n=1,
-            temperature=0.7
-        )
-        response=response.choices[0].message.content
+	try:
+		response = client.chat.completions.create(
+			model=model,
+			messages=[
+				{
+					"role": "system",
+					"content": content
+				},
+				{
+					"role": "user",
+					"content": prompt
+				}
+			],
+			max_tokens=750,
+			n=1,
+			temperature=0.7
+		)
 
-        print(response)
-        try:
-            if response[:3]=="```":
-                response=response[7:-3]
-
-            response_json = json.loads(response)
-            return response_json
-
-        except json.JSONDecodeError as e:
-            print("Error al decodificar JSON:", e)
-
-        return response
-    except OpenAIError as error:
-        print(f'ocurrio un error en la llamada a OpenAI: ${error}')
-
-        return None
+		return response.choices[0].message.content
+	except OpenAIError as error:
+		logger.error(f"An error occurred in the OpenAI call: {error}")
+		return None
 
 
-def format_dialog_to_json(dialog_text):
-    """
-    Convierte el texto de formato 'Scene X [Personaje: diálogo]' en formato JSON estructurado.
-    """
-    scenes_data = []
+def make_story_request(entry: dict, model: str = "gpt-4o-mini"):
+	"""
+	Makes a request to the OpenAI API for a story.
+	"""
 
-    # Usar una expresión regular para dividir el texto en escenas
-    scene_blocks = re.split(r"Scene (\d+)", dialog_text)
+	return make_request(get_story_content(), generate_story_prompt(entry), model)
 
-    # Iterar por las escenas, cada escena tiene su número y el texto de los diálogos
-    for i in range(1, len(scene_blocks), 2):
-        scene_id = int(scene_blocks[i].strip())  # Número de la escena
-        scene_dialogs = scene_blocks[i + 1].strip()  # Diálogos de la escena
 
-        # Extraer el contenido entre los corchetes y dividir los diálogos por los personajes
-        dialog_content = re.search(r"\[(.*?)\]", scene_dialogs)
-        if dialog_content:
-            dialog_lines = re.findall(r'([A-Z]): (.*?)(?=\s[A-Z]:|$)', dialog_content.group(1))
+def make_dialog_request(entry: dict, model: str = "gpt-4o-mini"):
+	"""
+	Makes a request to the OpenAI API for a dialog.
+	"""
 
-            dialog = []
-            for speaker, line_text in dialog_lines:
-                dialog.append({"speaker": speaker.strip(), "line": line_text.strip()})
-
-            # Añadir la escena y sus diálogos al resultado final
-            scenes_data.append({"scene_id": scene_id, "dialog": dialog})
-        else:
-            print(f"Advertencia: formato inesperado en la escena {scene_id}")
-
-    return scenes_data
+	return make_request(get_dialog_content(), generate_dialog_prompt(entry), model)

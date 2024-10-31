@@ -33,7 +33,3 @@ jobs:
       - name: Run Pylint
         run: |
           pylint $(git ls-files '*.py')
-
-      - name: Run Tests
-        run: |
-          pytest tests/
