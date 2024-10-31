@@ -55,6 +55,7 @@ def format_dialog_to_json(dialog_text):
     """
     Convierte el texto de formato 'Scene X [Personaje: diálogo]' en formato JSON estructurado.
     """
+    print(dialog_text)
     scenes_data = []
 
     # Usar una expresión regular para dividir el texto en escenas
