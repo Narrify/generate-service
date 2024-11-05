@@ -2,8 +2,7 @@
 This module contains the routes for generating stories and dialogs.
 """
 
-from fastapi import HTTPException, APIRouter, Depends, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi import HTTPException, APIRouter, status
 
 from app.clients.llm import make_dialog_request, make_story_request
 from app.clients.mongo import save_story
@@ -17,12 +16,11 @@ from app.prompts.dialog import generate_dialog_prompt
 from app.utils.validate import validate_user
 
 router = APIRouter()
-
-bearer = OAuth2PasswordBearer(tokenUrl="token")
+token = ""
 
 
 @router.post("/story")
-def post_story(request: StoryRequest, token: str = Depends(bearer)):
+def post_story(request: StoryRequest):
     """
     Generates a story based on the input prompt.
     """
@@ -44,11 +42,10 @@ def post_story(request: StoryRequest, token: str = Depends(bearer)):
 
 
 @router.post("/dialog")
-def post_dialog(request: DialogRequest, token: str = Depends(bearer)):
+def post_dialog(request: DialogRequest):
     """
     Generates a dialog based on the input prompt.
     """
-
     user = validate_user(token)
     entry = request.model_dump()
     prompt = generate_dialog_prompt(entry)

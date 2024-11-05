@@ -14,7 +14,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-bearer = OAuth2PasswordBearer(tokenUrl="token")
+token = ""
 
 
 @app.get("/", status_code=status.HTTP_200_OK)
@@ -27,7 +27,7 @@ async def hello_world():
 
 
 @app.get("/stories")
-def get_stories(token: str = Depends(bearer)):
+def get_stories():
     """
     Get all stories for the user.
     """
@@ -39,7 +39,7 @@ def get_stories(token: str = Depends(bearer)):
 
 
 @app.get("/dialogs")
-def get_dialogs(token: str = Depends(bearer)):
+def get_dialogs():
     """
     Get all dialogs for the user.
     """
