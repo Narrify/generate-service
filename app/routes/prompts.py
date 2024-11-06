@@ -1,5 +1,6 @@
 import json
 from tokenize import Token
+from turtledemo.penrose import start
 
 from fastapi.security import OAuth2PasswordBearer
 import httpx
@@ -8,9 +9,10 @@ import httpx
 TODO
 """
 
+from time import time
 from fastapi import APIRouter, Depends, status
 
-from app.clients.mongo import get_records
+from app.clients.mongo import get_records, insert_tracking
 
 router = APIRouter()
 from pydantic import ValidationError
@@ -19,11 +21,14 @@ from fastapi import HTTPException
 
 oauth = OAuth2PasswordBearer(tokenUrl="token")
 
+
 @router.get("/get")
 async def get_prompts(token: str = Depends(oauth)):
     """
     Get all prompts.
     """
+
+    startt = time()
 
     if not token:
         raise HTTPException(
@@ -47,11 +52,28 @@ async def get_prompts(token: str = Depends(oauth)):
     user_data = user_response.json()
     user_id = user_data.get("username")
 
+    endt = time()
+
     try:
+        insert_tracking(
+            route="/prompts/get",
+            status_code=200,
+            start_date=startt,
+            end_date=endt,
+            latency=endt - startt,
+        )
         records = get_records(user_id)
         return records
     except Exception as e:
         print(e)
+        insert_tracking(
+            route="/prompts/get",
+            status_code=500,
+            start_date=startt,
+            end_date=endt,
+            latency=endt - startt,
+        )
+
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error al obtener los registros",
