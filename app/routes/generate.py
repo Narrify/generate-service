@@ -56,7 +56,7 @@ async def generate_story(request: StoryRequest, token: str = Depends(oauth)):
 	try:
 		json_request = request.model_dump()
 		prompt = generate_story_prompt(json_request)
-		response = await make_request(prompt)
+		response = await make_request(prompt, response_type="story")
 
 		if isinstance(response, dict):
 			insert_record(user_id, response)
@@ -94,7 +94,7 @@ async def generate_dialog(request: DialogRequest, token: str = Depends(oauth)):
 	json_request = request.model_dump()
 	prompt = generate_dialog_prompt(json_request)
 
-	response = await make_request(prompt)
+	response = await make_request(prompt, response_type="dialog")
 
 	if isinstance(response, dict):
 		try:
