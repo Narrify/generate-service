@@ -96,8 +96,7 @@ async def generate_dialog(request: DialogRequest, token: str = Depends(oauth)):
     json_request = request.model_dump()
     prompt = generate_dialog_prompt(json_request)
 
-
- 	  response = await make_request(prompt, response_type="dialog")
+    response = await make_request(prompt, response_type="dialog")
     endt = time()
 
     if isinstance(response, dict):
