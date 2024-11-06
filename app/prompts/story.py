@@ -12,7 +12,7 @@ def generate_story_prompt(json_input):
     attributes = settings.get("attributes", [])
     
     characters = json_input.get("characters", [])
-    
+
     prompt = f"Title: {title}. Story size: {size}. "
 
     if attributes:
@@ -31,9 +31,10 @@ def generate_story_prompt(json_input):
     else:
         prompt += "Characters: No characters provided. "
 
-    prompt += (" Generate an engaging story structured in the following format: "
-               "JSON with keys 'title', 'genre', 'characters', and 'story' containing the following sections: "
+    prompt += ("Generate an engaging story structured in the following format: "
+               "Json with the keys 'title', 'characters' (only names) and 'story' containing the following sections: "
                "'introduction', 'conflict', 'rising_action', 'climax', 'falling_action', and 'resolution'. "
-               "Use the provided information and fill in any missing details to ensure a complete response.")
+               "Use the provided information and fill in any missing details to ensure a complete response. "
+               "Do not repeat the provided information, only include the story created with the basic information.")
 
     return prompt
