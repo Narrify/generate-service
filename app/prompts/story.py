@@ -1,40 +1,117 @@
-def generate_story_prompt(json_input):
+"""
+This module contains the prompts for the story model.
+"""
+from app.utils.format import format_characters
+
+
+def get_story_content():
     """
-    Genera un prompt para una historia basado en la entrada flexible del usuario.
-    Asegura que la respuesta final se adhiera a un formato estructurado, sin importar el formato de entrada.
+    Generates the content for the story model.
     """
-    story = json_input.get("story", "A new tale unfolds.") 
-    
-    title = json_input.get("title", "Untitled Story")
 
-    settings = json_input.get("settings", {})
-    size = settings.get("size", "medium") 
-    attributes = settings.get("attributes", [])
-    
-    characters = json_input.get("characters", [])
+    system_content = (
+        "You are a creative writing assistant. "
+        "Generate a concise JSON response representing a story based on the input."
+        "Keep the story around 500 tokens, "
+        "focusing on key moments and essential character interactions. "
+        "Maintain coherence while prioritizing brevity and impactful narrative progression. "
+        "Reflect character development "
+        "without extended descriptions or subplots. "
+        "Output in JSON format as: {\"title\": \"string\", \"story\": \"string\"} "
+        "with minimal whitespace."
+    )
 
-    prompt = f"Title: {title}. Story size: {size}. "
+    return system_content
 
-    if attributes:
-        prompt += "Attributes: " + ", ".join([f"{x['name']}: {x['value']}" for x in attributes]) + ". "
-    
-    if characters:
-        prompt += "Characters: "
-        for character in characters:
-            char_name = character.get("name", "Unnamed Character")
-            char_attrs = character.get("attributes", [])
-            if char_attrs:
-                char_attrs_str = ", ".join([f"{x['name']}: {x['value']}" for x in char_attrs])
-                prompt += f"{char_name} ({char_name[0]}): {char_attrs_str}. "
-            else:
-                prompt += f"{char_name} ({char_name[0]}): No attributes. "
-    else:
-        prompt += "Characters: No characters provided. "
 
-    prompt += ("Generate an engaging story structured in the following format: "
-               "Json with the keys 'title', 'characters' (only names) and 'story' containing the following sections: "
-               "'introduction', 'conflict', 'rising_action', 'climax', 'falling_action', and 'resolution'. "
-               "Use the provided information and fill in any missing details to ensure a complete response. "
-               "Do not repeat the provided information, only include the story created with the basic information.")
+def generate_story_prompt(entry: dict):
+    """
+    Generates a prompt for the dialog model based on the given entry.
+    """
+
+    prompt = f"title={entry['title']}|"
+    prompt += "attributes="
+
+    for attribute in entry['settings']['attributes']:
+        prompt += f"{str(attribute['value']).lower()},"
+
+    prompt = prompt[:-1] + "|"
+    prompt += "characters="
+
+    format_characters(prompt, entry)
 
     return prompt
+
+
+example_story = {
+    "title": "The Quest of the Lost Kingdom",
+    "settings": {
+        "attributes": [
+            {
+                "key": "location",
+                "value": "ancient forest and forgotten ruins"
+            },
+            {
+                "key": "climate",
+                "value": "mysterious mist with sporadic sunlight"
+            },
+            {
+                "key": "era",
+                "value": "medieval fantasy"
+            }
+        ]
+    },
+    "characters": [
+        {
+            "name": "Eldrin",
+            "attributes": [
+                {
+                    "key": "role",
+                    "value": "brave warrior"
+                },
+                {
+                    "key": "personality",
+                    "value": "determined and loyal"
+                },
+                {
+                    "key": "goal",
+                    "value": "to restore honor to his family"
+                }
+            ]
+        },
+        {
+            "name": "Lyra",
+            "attributes": [
+                {
+                    "key": "role",
+                    "value": "wise healer"
+                },
+                {
+                    "key": "personality",
+                    "value": "empathetic but reserved"
+                },
+                {
+                    "key": "goal",
+                    "value": "to find the ancient healing stone"
+                }
+            ]
+        },
+        {
+            "name": "Morrick",
+            "attributes": [
+                {
+                    "key": "role",
+                    "value": "cunning rogue"
+                },
+                {
+                    "key": "personality",
+                    "value": "sarcastic but clever"
+                },
+                {
+                    "key": "goal",
+                    "value": "to uncover hidden treasures for personal gain"
+                }
+            ]
+        }
+    ],
+}

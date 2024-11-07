@@ -1,27 +1,78 @@
 """
-TODO
+This module contains the functions to generate prompts for the dialog model.
 """
+from app.utils.format import format_characters
 
-def generate_dialog_prompt(json):
-    """
-    Genera un prompt eficiente para diálogos usando los datos proporcionados en el JSON.
-    """
-    # Base del prompt con la historia y la configuración de escenas y personajes
-    prompt = f"Story: {json['story']}. "
-    prompt += f"Scenes: {json['settings']['number_of_scenes']}, "
 
-    # Agregar los personajes y sus atributos de forma compacta
-    prompt += "Characters: "
-    for character in json['characters']:
-        # Crear un string compacto con los atributos del personaje
-        char_attrs = ", ".join([f"{x['name']}: {x['value']}" for x in character['attributes']])
-        prompt += f"{character['name']} ({character['name'][0]}): {char_attrs}. "
-
-    # Instrucción clara y específica sobre cómo manejar los caracteres
-    prompt += f"""
-    Generate a concise dialog using initials for characters and divide it into {json['settings']['number_of_scenes']} Scene. 
-    Do not use contractions. so the entire dialog is in a single line .
-    Format the dialog as follows: Scene 1 [A: line, L: line,...] Scene 2 [...]  the Scene force without line breaks .
+def get_dialog_content():
     """
+    Generates the content for the dialog model.
+    """
+
+    system_content = (
+        "You are a creative writing assistant."
+        "Generate a JSON response containing a concise list of scenes."
+        "Keep the response around 500 tokens,"
+        "each scene should include 'scene_number' and "
+        "an array of 'dialogues' where each dialogue has a 'character' and 'line'. "
+        "Characters may speak in any order, with one character able "
+        "to have multiple lines before another responds."
+        "Keep responses brief but coherent, focusing on natural interactions. "
+        "Output in JSON format as: "
+        "[{\"scene_number\": 1, \"dialogues\": [{\"character\": \"name\", \"line\": \"text\"}]}] "
+        "with minimal whitespace."
+    )
+
+    return system_content
+
+
+def generate_dialog_prompt(entry: dict):
+    """
+    Generates a prompt for the dialog model based on the given entry.
+    """
+
+    prompt = f"story={entry['story']}|"
+    prompt += f"scenes={entry['settings']['number_of_scenes']}|"
+
+    prompt += "characters="
+
+    format_characters(prompt, entry)
 
     return prompt
+
+
+example_dialog = {
+    "story": "The Quest of the Lost Kingdom",
+    "settings": {
+        "number_of_scenes": 3,
+        "number_of_characters": 2
+    },
+    "characters": [
+        {
+            "name": "Eldrin",
+            "attributes": [
+                {
+                    "key": "personality",
+                    "value": "determined and loyal"
+                },
+                {
+                    "key": "role",
+                    "value": "brave warrior"
+                }
+            ]
+        },
+        {
+            "name": "Lyra",
+            "attributes": [
+                {
+                    "key": "personality",
+                    "value": "empathetic but reserved"
+                },
+                {
+                    "key": "role",
+                    "value": "wise healer"
+                }
+            ]
+        }
+    ]
+}
