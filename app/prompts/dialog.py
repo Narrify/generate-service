@@ -1,6 +1,7 @@
 """
 This module contains the functions to generate prompts for the dialog model.
 """
+
 from app.utils.format import format_characters
 
 
@@ -39,40 +40,3 @@ def generate_dialog_prompt(entry: dict):
     format_characters(prompt, entry)
 
     return prompt
-
-
-example_dialog = {
-    "story": "The Quest of the Lost Kingdom",
-    "settings": {
-        "number_of_scenes": 3,
-        "number_of_characters": 2
-    },
-    "characters": [
-        {
-            "name": "Eldrin",
-            "attributes": [
-                {
-                    "key": "personality",
-                    "value": "determined and loyal"
-                },
-                {
-                    "key": "role",
-                    "value": "brave warrior"
-                }
-            ]
-        },
-        {
-            "name": "Lyra",
-            "attributes": [
-                {
-                    "key": "personality",
-                    "value": "empathetic but reserved"
-                },
-                {
-                    "key": "role",
-                    "value": "wise healer"
-                }
-            ]
-        }
-    ]
-}

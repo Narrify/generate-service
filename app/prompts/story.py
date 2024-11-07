@@ -1,6 +1,7 @@
 """
 This module contains the prompts for the story model.
 """
+
 from app.utils.format import format_characters
 
 
@@ -11,14 +12,15 @@ def get_story_content():
 
     system_content = (
         "You are a creative writing assistant. "
-        "Generate a concise JSON response representing a story based on the input."
-        "Keep the story around 500 tokens, "
-        "focusing on key moments and essential character interactions. "
-        "Maintain coherence while prioritizing brevity and impactful narrative progression. "
-        "Reflect character development "
-        "without extended descriptions or subplots. "
-        "Output in JSON format as: {\"title\": \"string\", \"story\": \"string\"} "
-        "with minimal whitespace."
+        "Generate a concise story in JSON format based on the input. "
+        "Include the keys: 'title', 'characters' (only names), and 'story' with sections: "
+        "'introduction', 'conflict', 'rising_action', 'climax', 'falling_action', 'resolution'. "
+        "Limit the story to around 500 tokens, focusing on key moments and essential character interactions. "
+        "Ensure coherence, prioritize impactful narrative progression, and reflect character development. "
+        "Avoid extended descriptions or subplots. "
+        "Output format: {\"title\": \"string\", \"characters\": [\"string\"], \"story\": {\"introduction\": \"string\", "
+        "\"conflict\": \"string\", \"rising_action\": \"string\", \"climax\": \"string\", "
+        "\"falling_action\": \"string\", \"resolution\": \"string\"}} with minimal whitespace."
     )
 
     return system_content
@@ -41,77 +43,3 @@ def generate_story_prompt(entry: dict):
     format_characters(prompt, entry)
 
     return prompt
-
-
-example_story = {
-    "title": "The Quest of the Lost Kingdom",
-    "settings": {
-        "attributes": [
-            {
-                "key": "location",
-                "value": "ancient forest and forgotten ruins"
-            },
-            {
-                "key": "climate",
-                "value": "mysterious mist with sporadic sunlight"
-            },
-            {
-                "key": "era",
-                "value": "medieval fantasy"
-            }
-        ]
-    },
-    "characters": [
-        {
-            "name": "Eldrin",
-            "attributes": [
-                {
-                    "key": "role",
-                    "value": "brave warrior"
-                },
-                {
-                    "key": "personality",
-                    "value": "determined and loyal"
-                },
-                {
-                    "key": "goal",
-                    "value": "to restore honor to his family"
-                }
-            ]
-        },
-        {
-            "name": "Lyra",
-            "attributes": [
-                {
-                    "key": "role",
-                    "value": "wise healer"
-                },
-                {
-                    "key": "personality",
-                    "value": "empathetic but reserved"
-                },
-                {
-                    "key": "goal",
-                    "value": "to find the ancient healing stone"
-                }
-            ]
-        },
-        {
-            "name": "Morrick",
-            "attributes": [
-                {
-                    "key": "role",
-                    "value": "cunning rogue"
-                },
-                {
-                    "key": "personality",
-                    "value": "sarcastic but clever"
-                },
-                {
-                    "key": "goal",
-                    "value": "to uncover hidden treasures for personal gain"
-                }
-            ]
-        }
-    ],
-}

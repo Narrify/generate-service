@@ -3,6 +3,7 @@ This module contains the client for the OpenAI API.
 """
 
 from os import getenv
+from json import loads
 
 from openai import OpenAI, OpenAIError
 
@@ -25,11 +26,6 @@ def make_request(content: str, prompt: str, model: str = "gpt-4o-mini"):
     """
     Makes a request to the OpenAI API.
     """
-    system_prompt = "You are a dialog and story generator for videogames."
-    if response_type == "h":
-        system_prompt += " Generate the response as a structured dialogue with speakers and their lines."
-    elif response_type == "story":
-        system_prompt += " Generate the response as a structured story with sections like introduction, conflict, and resolution."
 
     try:
         response = client.chat.completions.create(
@@ -60,7 +56,7 @@ def make_story_request(entry: dict, model: str = "gpt-4o-mini"):
     Makes a request to the OpenAI API for a story.
     """
 
-    return make_request(get_story_content(), generate_story_prompt(entry), model)
+    return loads(make_request(get_story_content(), generate_story_prompt(entry), model))
 
 
 def make_dialog_request(entry: dict, model: str = "gpt-4o-mini"):
@@ -68,4 +64,4 @@ def make_dialog_request(entry: dict, model: str = "gpt-4o-mini"):
     Makes a request to the OpenAI API for a dialog.
     """
 
-    return make_request(get_dialog_content(), generate_dialog_prompt(entry), model)
+    return loads(make_request(get_dialog_content(), generate_dialog_prompt(entry), model))
