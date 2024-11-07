@@ -25,6 +25,11 @@ def make_request(content: str, prompt: str, model: str = "gpt-4o-mini"):
     """
     Makes a request to the OpenAI API.
     """
+    system_prompt = "You are a dialog and story generator for videogames."
+    if response_type == "h":
+        system_prompt += " Generate the response as a structured dialogue with speakers and their lines."
+    elif response_type == "story":
+        system_prompt += " Generate the response as a structured story with sections like introduction, conflict, and resolution."
 
     try:
         response = client.chat.completions.create(

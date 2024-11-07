@@ -5,6 +5,8 @@ This module contains the functions to interact with the MongoDB database.
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
+from uuid import uuid4
+
 client = MongoClient("mongodb://localhost:27017/")
 
 db = client["narrify"]
