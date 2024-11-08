@@ -2,13 +2,18 @@
 Main file for the FastAPI application
 """
 
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
+from fastapi.security import OAuth2PasswordBearer
 
-from app.clients.mongo import get_dialogs, get_stories
+from time import time
+
+from app.clients.mongo import get_dialogs, get_stories, insert_track
 from app.routes import generate
 
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
+
+from app.utils.external import validate
 
 app = FastAPI(
     title="Narrify | Generation API",
@@ -54,6 +59,8 @@ app.add_middleware(
     CounterMiddleware
 )
 
+oauth = OAuth2PasswordBearer(tokenUrl="token")
+
 
 @app.get("/")
 async def hello_world():
@@ -84,23 +91,33 @@ async def get_metrics():
 
 
 @app.get("/stories")
-def stories():
+def stories(token: str = Depends(oauth)):
     """
     Get all stories for the user.
     """
 
-    entries = get_stories("user_id")
+    start_time = time()
+
+    user = validate(token, "/stories", start_time)
+    entries = get_stories(user["id"])
+
+    insert_track("/stories", 200, start_time, time())
 
     return entries
 
 
 @app.get("/dialogs")
-def dialogs():
+def dialogs(token: str = Depends(oauth)):
     """
     Get all dialogs for the user.
     """
 
-    entries = get_dialogs("user_id")
+    start_time = time()
+
+    user = validate(token, "/dialogs", start_time)
+    entries = get_dialogs(user["id"])
+
+    insert_track("/dialogs", 200, start_time, time())
 
     return entries
 

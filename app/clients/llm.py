@@ -5,6 +5,7 @@ This module contains the client for the OpenAI API.
 from os import getenv
 from json import loads
 
+from fastapi import HTTPException
 from openai import OpenAI, OpenAIError
 
 from app.prompts.story import get_story_content, generate_story_prompt
