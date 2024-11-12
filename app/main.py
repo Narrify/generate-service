@@ -91,14 +91,14 @@ async def get_metrics():
 
 
 @app.get("/stories")
-def stories(token: str = Depends(oauth)):
+async def stories(token: str = Depends(oauth)):
     """
     Get all stories for the user.
     """
 
     start_time = time()
 
-    user = validate(token, "/stories", start_time)
+    user = await validate(token, "/stories", start_time)
     entries = get_stories(user["id"])
 
     insert_track("/stories", 200, start_time, time())
@@ -107,14 +107,14 @@ def stories(token: str = Depends(oauth)):
 
 
 @app.get("/dialogs")
-def dialogs(token: str = Depends(oauth)):
+async def dialogs(token: str = Depends(oauth)):
     """
     Get all dialogs for the user.
     """
 
     start_time = time()
 
-    user = validate(token, "/dialogs", start_time)
+    user = await validate(token, "/dialogs", start_time)
     entries = get_dialogs(user["id"])
 
     insert_track("/dialogs", 200, start_time, time())

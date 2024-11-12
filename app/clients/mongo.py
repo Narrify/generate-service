@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
 from uuid import uuid4
+import json
 
 client = MongoClient("mongodb://localhost:27017/")
 
@@ -43,9 +44,13 @@ def save_dialog(user_id: str, dialog: dict):
     """
     Save a dialog to the database.
     """
+    document = {
+        "id": user_id,
+        "dialog": dialog
+    }
 
     try:
-        dialogs.insert_one({"id": user_id, **dialog})
+        dialogs.insert_one(document)
         return True
     except PyMongoError:
         return False

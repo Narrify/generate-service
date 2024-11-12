@@ -20,14 +20,14 @@ oauth = OAuth2PasswordBearer(tokenUrl="token")
 
 
 @router.post("/story")
-def story(request: StoryRequest, token: str = Depends(oauth)):
+async def story(request: StoryRequest, token: str = Depends(oauth)):
     """
     Generates a story based on the input prompt.
     """
 
     start_time = time()
 
-    user = validate(token, "generate/story", start_time)
+    user = await validate(token, "generate/story", start_time)
     entry = request.model_dump()
     response = make_story_request(entry)
 
@@ -47,14 +47,14 @@ def story(request: StoryRequest, token: str = Depends(oauth)):
 
 
 @router.post("/dialog")
-def dialog(request: DialogRequest, token: str = Depends(oauth)):
+async def dialog(request: DialogRequest, token: str = Depends(oauth)):
     """
     Generates a dialog based on the input prompt.
     """
 
     start_time = time()
 
-    user = validate(token, "generate/dialog", start_time)
+    user = await validate(token, "generate/dialog", start_time)
     entry = request.model_dump()
     response = make_dialog_request(entry)
 
