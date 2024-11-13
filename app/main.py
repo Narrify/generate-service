@@ -56,10 +56,9 @@ class CounterMiddleware(BaseHTTPMiddleware):
         return response
 
 
-#
-# app.add_middleware(
-#     CounterMiddleware
-# )
+app.add_middleware(
+    CounterMiddleware
+)
 
 oauth = OAuth2PasswordBearer(tokenUrl="token")
 

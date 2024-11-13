@@ -56,7 +56,7 @@ def save_dialog(user_id: str, dialog: dict):
     }
 
     try:
-        stories.insert_one(document)
+        dialogs.insert_one(document)
         return True
     except PyMongoError:
         return False
