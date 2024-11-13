@@ -2,13 +2,21 @@
 This module contains the functions to interact with the MongoDB database.
 """
 
+from uuid import uuid4
+
 from pymongo import MongoClient
 from pymongo.errors import PyMongoError
 
-from uuid import uuid4
-import json
+from app.log import logger
 
 client = MongoClient("mongodb://localhost:27017/")
+
+try:
+    client.server_info()
+except PyMongoError:
+    logger.error("MongoDB is not SET.")
+
+logger.info("MongoDB Ready")
 
 db = client["narrify"]
 
@@ -32,6 +40,7 @@ def save_story(user_id: str, story: dict):
 
     try:
         stories.insert_one(document)
+        logger.info("story saved for user: %s.", user_id)
         return True
     except PyMongoError:
         return False
@@ -57,6 +66,7 @@ def save_dialog(user_id: str, dialog: dict):
 
     try:
         dialogs.insert_one(document)
+        logger.info("dialog saved for user: %s.", user_id)
         return True
     except PyMongoError:
         return False

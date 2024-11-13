@@ -2,18 +2,16 @@
 Main file for the FastAPI application
 """
 
+from time import time
+
 from fastapi import Depends, FastAPI, Request
 from fastapi.security import OAuth2PasswordBearer
-
-from time import time
-from json import loads
-
-from app.clients.mongo import get_dialogs, get_stories, insert_track
-from app.routes import generate
 
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from app.clients.mongo import get_dialogs, get_stories, insert_track
+from app.routes import generate
 from app.utils.external import validate
 
 app = FastAPI(
@@ -42,7 +40,15 @@ counts = {
 
 
 class CounterMiddleware(BaseHTTPMiddleware):
+    """
+    Middleware to count the number of requests.
+    """
+
     async def dispatch(self, request: Request, call_next):
+        """
+        Middleware to count the number of requests.
+        """
+
         response = await call_next(request)
         status_code = response.status_code
 
@@ -54,6 +60,13 @@ class CounterMiddleware(BaseHTTPMiddleware):
             counts["5xx"] += 1
 
         return response
+
+    def useless_method(self):
+        """
+        Use this method to test the code analysis.
+        """
+
+        return self
 
 
 app.add_middleware(
@@ -74,6 +87,10 @@ async def hello_world():
 
 @app.get("/metrics")
 async def get_metrics():
+    """
+    Get the metrics for the API.
+    """
+
     try:
         availability = counts["2xx"] / (counts["2xx"] + counts["5xx"])
     except ZeroDivisionError:
@@ -89,11 +106,6 @@ async def get_metrics():
         "reliability": reliability,
         "counts": counts
     }
-
-
-def to_json(document):
-    document["_id"] = str(document["_id"])  # Convert ObjectId to string
-    return document
 
 
 @app.get("/stories")

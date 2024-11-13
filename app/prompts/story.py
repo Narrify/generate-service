@@ -15,12 +15,12 @@ def get_story_content():
         "Generate a concise story in JSON format based on the input. "
         "Include the keys: 'title', 'characters' (only names), and 'story' with sections: "
         "'introduction', 'conflict', 'rising_action', 'climax', 'falling_action', 'resolution'. "
-        "Limit the story to around 500 tokens, focusing on key moments and essential character interactions. "
-        "Ensure coherence, prioritize impactful narrative progression, and reflect character development. "
+        "Limit the story to around 500 tokens, focusing on key moments and essential interactions. "
+        "Ensure coherence, prioritize impactful progression, and reflect character development. "
         "Avoid extended descriptions or subplots. "
-        "Output format: {\"title\": \"string\", \"characters\": [\"string\"], \"story\": {\"introduction\": \"string\", "
-        "\"conflict\": \"string\", \"rising_action\": \"string\", \"climax\": \"string\", "
-        "\"falling_action\": \"string\", \"resolution\": \"string\"}} with minimal whitespace."
+        "Format: {\"title\": \"str\", \"characters\": [\"str\"], \"story\": {\"introduction\": "
+        "\"str\", \"conflict\": \"str\", \"rising_action\": \"str\", \"climax\": \"str\", "
+        "\"falling_action\": \"str\", \"resolution\": \"string\"}} with minimal whitespace."
     )
 
     return system_content

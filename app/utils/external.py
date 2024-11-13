@@ -1,3 +1,7 @@
+"""
+This module contains the function that validates the token and returns the user data.
+"""
+
 from os import getenv
 from time import time
 
@@ -8,6 +12,10 @@ from app.clients.mongo import insert_track
 
 
 async def validate(token: str, route: str, start_time):
+    """
+    This function validates the token and returns the user data.
+    """
+
     if not token:
         insert_track(route, 401, start_time, time())
 
