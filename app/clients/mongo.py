@@ -25,8 +25,13 @@ def save_story(user_id: str, story: dict):
     Save a story to the database.
     """
 
+    document = {
+        "id": user_id,
+        "response": story
+    }
+
     try:
-        stories.insert_one({"id": user_id, **story})
+        stories.insert_one(document)
         return True
     except PyMongoError:
         return False
@@ -44,13 +49,14 @@ def save_dialog(user_id: str, dialog: dict):
     """
     Save a dialog to the database.
     """
+
     document = {
         "id": user_id,
-        "dialog": dialog
+        "response": dialog
     }
 
     try:
-        dialogs.insert_one(document)
+        stories.insert_one(document)
         return True
     except PyMongoError:
         return False

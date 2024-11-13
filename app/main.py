@@ -6,6 +6,7 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.security import OAuth2PasswordBearer
 
 from time import time
+from json import loads
 
 from app.clients.mongo import get_dialogs, get_stories, insert_track
 from app.routes import generate
@@ -55,9 +56,10 @@ class CounterMiddleware(BaseHTTPMiddleware):
         return response
 
 
-app.add_middleware(
-    CounterMiddleware
-)
+#
+# app.add_middleware(
+#     CounterMiddleware
+# )
 
 oauth = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -90,6 +92,11 @@ async def get_metrics():
     }
 
 
+def to_json(document):
+    document["_id"] = str(document["_id"])  # Convert ObjectId to string
+    return document
+
+
 @app.get("/stories")
 async def stories(token: str = Depends(oauth)):
     """
@@ -103,7 +110,7 @@ async def stories(token: str = Depends(oauth)):
 
     insert_track("/stories", 200, start_time, time())
 
-    return entries
+    return [{k: v for k, v in document.items() if k != "_id"} for document in entries]
 
 
 @app.get("/dialogs")
@@ -119,7 +126,7 @@ async def dialogs(token: str = Depends(oauth)):
 
     insert_track("/dialogs", 200, start_time, time())
 
-    return entries
+    return [{k: v for k, v in document.items() if k != "_id"} for document in entries]
 
 
 app.include_router(generate.router, prefix="/generate")
