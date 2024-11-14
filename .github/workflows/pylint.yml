@@ -1,4 +1,4 @@
-name: CI
+name: Pylint test
 
 on:
   push:

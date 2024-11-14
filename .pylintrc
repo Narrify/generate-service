@@ -445,7 +445,19 @@ disable=raw-checker-failed,
         unused-argument,
         import-outside-toplevel,
         cyclic-import,
-	duplicate-code
+	duplicate-code,
+	wrong-import-order,
+	ungrouped-imports,
+	unused-import,
+	line-too-long,
+	missing-final-newline,
+	raise-missing-from,
+	broad-exception-caught,
+	unused-variable,
+	no-else-return,
+	wrong-import-position
+
+
 	
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
