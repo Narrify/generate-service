@@ -1,5 +1,5 @@
 """
-TODO
+This module contains the Pydantic models for the Dialog API.
 """
 
 from typing import List
@@ -10,7 +10,7 @@ from app.models.shared import Character
 
 class DialogSettings(BaseModel):
     """
-    TODO
+    Pydantic model for the settings of a dialog.
     """
 
     number_of_scenes: int
@@ -19,7 +19,7 @@ class DialogSettings(BaseModel):
 
 class DialogRequest(BaseModel):
     """
-    TODO
+    Pydantic model for a dialog request.
     """
 
     story: str

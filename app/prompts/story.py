@@ -1,39 +1,45 @@
-def generate_story_prompt(json_input):
+"""
+This module contains the prompts for the story model.
+"""
+
+from app.utils.format import format_characters
+
+
+def get_story_content():
     """
-    Genera un prompt para una historia basado en la entrada flexible del usuario.
-    Asegura que la respuesta final se adhiera a un formato estructurado, sin importar el formato de entrada.
+    Generates the content for the story model.
     """
-    story = json_input.get("story", "A new tale unfolds.") 
-    
-    title = json_input.get("title", "Untitled Story")
 
-    settings = json_input.get("settings", {})
-    size = settings.get("size", "medium") 
-    attributes = settings.get("attributes", [])
-    
-    characters = json_input.get("characters", [])
-    
-    prompt = f"Title: {title}. Story size: {size}. "
+    system_content = (
+        "You are a creative writing assistant. "
+        "Generate a concise story in JSON format based on the input. "
+        "Include the keys: 'title', 'characters' (only names), and 'story' with sections: "
+        "'introduction', 'conflict', 'rising_action', 'climax', 'falling_action', 'resolution'. "
+        "Limit the story to around 500 tokens, focusing on key moments and essential interactions. "
+        "Ensure coherence, prioritize impactful progression, and reflect character development. "
+        "Avoid extended descriptions or subplots. "
+        "Format: {\"title\": \"str\", \"characters\": [\"str\"], \"story\": {\"introduction\": "
+        "\"str\", \"conflict\": \"str\", \"rising_action\": \"str\", \"climax\": \"str\", "
+        "\"falling_action\": \"str\", \"resolution\": \"string\"}} with minimal whitespace."
+    )
 
-    if attributes:
-        prompt += "Attributes: " + ", ".join([f"{x['name']}: {x['value']}" for x in attributes]) + ". "
-    
-    if characters:
-        prompt += "Characters: "
-        for character in characters:
-            char_name = character.get("name", "Unnamed Character")
-            char_attrs = character.get("attributes", [])
-            if char_attrs:
-                char_attrs_str = ", ".join([f"{x['name']}: {x['value']}" for x in char_attrs])
-                prompt += f"{char_name} ({char_name[0]}): {char_attrs_str}. "
-            else:
-                prompt += f"{char_name} ({char_name[0]}): No attributes. "
-    else:
-        prompt += "Characters: No characters provided. "
+    return system_content
 
-    prompt += (" Generate an engaging story structured in the following format: "
-               "JSON with keys 'title', 'genre', 'characters', and 'story' containing the following sections: "
-               "'introduction', 'conflict', 'rising_action', 'climax', 'falling_action', and 'resolution'. "
-               "Use the provided information and fill in any missing details to ensure a complete response.")
+
+def generate_story_prompt(entry: dict):
+    """
+    Generates a prompt for the dialog model based on the given entry.
+    """
+
+    prompt = f"title={entry['title']}|"
+    prompt += "attributes="
+
+    for attribute in entry['settings']['attributes']:
+        prompt += f"{str(attribute['value']).lower()},"
+
+    prompt = prompt[:-1] + "|"
+    prompt += "characters="
+
+    format_characters(prompt, entry)
 
     return prompt

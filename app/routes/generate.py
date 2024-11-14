@@ -1,30 +1,23 @@
-import json
-
-from fastapi.security import OAuth2PasswordBearer
-import httpx
-
 """
-TODO
+This module contains the routes for generating stories and dialogs.
 """
 
 from time import time
-from fastapi import APIRouter, Depends, status
+
+from fastapi import Depends, HTTPException, APIRouter, status
+from fastapi.security import OAuth2PasswordBearer
+
+from app.clients.llm import make_dialog_request, make_story_request
+from app.clients.mongo import insert_track, save_dialog, save_story
+
+from app.models.story import StoryRequest
 from app.models.dialog import DialogRequest
-from app.models.story import StoryRequest, StoryResponse
-
-from app.prompts.dialog import generate_dialog_prompt
-from app.prompts.story import generate_story_prompt
-
-from app.clients.llm import make_request
-from app.clients.mongo import insert_record, insert_tracking
+from app.utils.external import validate
 
 import os
 from dotenv import load_dotenv
 
 router = APIRouter()
-from pydantic import ValidationError
-
-from fastapi import HTTPException
 
 oauth = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -35,97 +28,58 @@ except Exception as e:
     print(f"OCURRIO UN ERROR AL CARGAR LA VARIABLE DE ENTORNO USER_SERVICE_HOST, {e}")    
 
 @router.post("/story")
-async def generate_story(request: StoryRequest, token: str = Depends(oauth)):
+async def story(request: StoryRequest, token: str = Depends(oauth)):
     """
-    Generates a story based on the StoryRequest.
+    Generates a story based on the input prompt.
     """
 
-    startt = time()
+    start_time = time()
 
-    if not token:
+    user = await validate(token, "generate/story", start_time)
+    entry = request.model_dump()
+    response = make_story_request(entry)
+
+    if not response:
+        insert_track("generate/story", 500, start_time, time())
+
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unauthorized",
-            headers={"WWW-Authenticate": "Bearer"},
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error making request",
         )
 
     user_service_url = f"http://{USER_SERVICE_HOST}/users/me"
     headers = {"Authorization": f"Bearer {token}"}
+    save_story(user["id"], response)
 
-    async with httpx.AsyncClient() as client:
-        user_response = await client.get(user_service_url, headers=headers)
+    insert_track("generate/story", 200, start_time, time())
 
-    if user_response.status_code != 200:
-        raise HTTPException(
-            status_code=user_response.status_code,
-            detail="Error al obtener el usuario",
-        )
-
-    user_data = user_response.json()
-    user_id = user_data.get("username")
-
-    try:
-        json_request = request.model_dump()
-        prompt = generate_story_prompt(json_request)
-        response = await make_request(prompt)
-
-        endt = time()
-
-        insert_tracking("generate/story", 200, startt, endt, endt - startt)
-
-        if isinstance(response, dict):
-            insert_record(user_id, response)
-            return response
-        else:
-            insert_tracking("generate/story", 500, startt, endt, endt - startt)
-            return {"error": "Unexpected response type from make_request", "response": response}
-    except ValidationError as e:
-        raise HTTPException(status_code=422, detail="Invalid input format")
+    return response
 
 
 @router.post("/dialog")
-async def generate_dialog(request: DialogRequest, token: str = Depends(oauth)):
+async def dialog(request: DialogRequest, token: str = Depends(oauth)):
     """
-    Generates a dialog based on the DialogRequest.
+    Generates a dialog based on the input prompt.
     """
 
-    startt = time()
+    start_time = time()
 
-    if not token:
-        raise HTTPException(status_code=401, detail="Token not found")
+    user = await validate(token, "generate/dialog", start_time)
+    entry = request.model_dump()
+    response = make_dialog_request(entry)
 
     user_service_url = f"http://{USER_SERVICE_HOST}/users/me"
     headers = {"Authorization": f"Bearer {token}"}
+    if not response:
+        insert_track("generate/dialog", 500, start_time, time())
 
-    async with httpx.AsyncClient() as client:
-        user_response = await client.get(user_service_url, headers=headers)
-
-    if user_response.status_code != 200:
         raise HTTPException(
-            status_code=user_response.status_code,
-            detail="Error al obtener el usuario",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error making request",
         )
 
-    user_data = user_response.json()
-    user_id = user_data.get("username")
+    save_dialog(user["id"], response)
 
-    json_request = request.model_dump()
-    prompt = generate_dialog_prompt(json_request)
-
-    response = await make_request(prompt)
-
-    endt = time()
-
-    if isinstance(response, dict):
-        try:
-            insert_record(user_id, response)
-            insert_tracking("generate/dialog", 200, startt, endt, endt - startt)
-            return response
-        except json.JSONDecodeError:
-            insert_tracking("generate/dialog", 500, startt, endt, endt - startt)
-            return {
-                "error": "Invalid JSON response from make_request",
-                "response": response
-            }
+    insert_track("generate/dialog", 200, start_time, time())
 
     return response

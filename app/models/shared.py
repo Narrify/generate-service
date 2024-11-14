@@ -1,24 +1,24 @@
 """
-TODO
+This module contains the shared models for the application.
 """
 
-from typing import List
+from typing import List, Optional
 from pydantic import BaseModel
 
 
 class Attribute(BaseModel):
     """
-    TODO
+    Pydantic model for an attribute.
     """
 
-    name: str
+    key: str
     value: str
 
 
 class Character(BaseModel):
     """
-    TODO
+    Pydantic model for a character.
     """
 
     name: str
-    attributes: List[Attribute]
+    attributes: Optional[List[Attribute]] = None
