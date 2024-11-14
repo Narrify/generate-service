@@ -455,7 +455,9 @@ disable=raw-checker-failed,
 	broad-exception-caught,
 	unused-variable,
 	no-else-return,
-	wrong-import-position
+	wrong-import-position,
+	redefined-builtin,
+	pointless-string-statement
 
 
 	
