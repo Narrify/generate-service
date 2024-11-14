@@ -1,9 +1,11 @@
-name: CI
+name: Pylint test
 
 on:
   push:
     branches:
       - main
+      - dev
+      - qaenv
 
 jobs:
   run:

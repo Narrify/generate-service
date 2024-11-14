@@ -1,0 +1,73 @@
+name: JMeter Tests
+
+on:
+  push:
+    branches:
+      - qaenv
+
+jobs:
+  jmeter:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: narrify_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U test_user"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+          
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/narrify_db
+      SECRET_KEY: your_secret_key
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set Up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.12'
+
+      - name: Create and activate virtual environment
+        run: |
+          python -m venv .venv
+          source .venv/bin/activate  # Linux/Mac
+          # Para Windows: .venv\Scripts\activate
+
+      - name: Install dependencies
+        run: |
+          .venv/bin/pip install --upgrade pip
+          .venv/bin/pip install -r requirements.txt
+
+      - name: Run FastAPI application
+        run: |
+          nohup .venv/bin/uvicorn app.main:app --host localhost --port 8000 &
+          sleep 5
+
+      - name: Install JMeter
+        run: |
+          wget https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xzf apache-jmeter-5.6.3.tgz
+
+      - name: Run JMeter Tests
+        run: |
+          ./apache-jmeter-5.6.3/bin/jmeter -n -t ./test/load-test/stress-test.jmx -l result.jtl
+
+      - name: Upload Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: jmeter-results
+          path: result.jtl
+
