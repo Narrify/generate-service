@@ -8,7 +8,8 @@ import httpx
 """
 TODO
 """
-
+import os
+from dotenv import load_dotenv
 from time import time
 from fastapi import APIRouter, Depends, status
 
@@ -19,8 +20,14 @@ from pydantic import ValidationError
 
 from fastapi import HTTPException
 
+
 oauth = OAuth2PasswordBearer(tokenUrl="token")
 
+
+try: 
+    USER_SERVICE_HOST=os.getenv("USER_SERVICE_HOST")
+except Exception as e:
+    print(f"OCURRIO UN ERROR AL CARGAR LA VARIABLE DE ENTORNO USER_SERVICE_HOST, {e}")
 
 @router.get("/get")
 async def get_prompts(token: str = Depends(oauth)):
@@ -37,7 +44,7 @@ async def get_prompts(token: str = Depends(oauth)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user_service_url = "http://127.0.0.1:8000/users/me"
+    user_service_url = f"http://{USER_SERVICE_HOST}/users/me"
     headers = {"Authorization": f"Bearer {token}"}
 
     async with httpx.AsyncClient() as client:

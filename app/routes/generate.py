@@ -18,6 +18,9 @@ from app.prompts.story import generate_story_prompt
 from app.clients.llm import make_request
 from app.clients.mongo import insert_record, insert_tracking
 
+import os
+from dotenv import load_dotenv
+
 router = APIRouter()
 from pydantic import ValidationError
 
@@ -25,6 +28,11 @@ from fastapi import HTTPException
 
 oauth = OAuth2PasswordBearer(tokenUrl="token")
 
+
+try: 
+    USER_SERVICE_HOST=os.getenv("USER_SERVICE_HOST")
+except Exception as e:
+    print(f"OCURRIO UN ERROR AL CARGAR LA VARIABLE DE ENTORNO USER_SERVICE_HOST, {e}")    
 
 @router.post("/story")
 async def generate_story(request: StoryRequest, token: str = Depends(oauth)):
@@ -41,7 +49,7 @@ async def generate_story(request: StoryRequest, token: str = Depends(oauth)):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user_service_url = "http://127.0.0.1:8000/users/me"
+    user_service_url = f"http://{USER_SERVICE_HOST}/users/me"
     headers = {"Authorization": f"Bearer {token}"}
 
     async with httpx.AsyncClient() as client:
@@ -86,7 +94,7 @@ async def generate_dialog(request: DialogRequest, token: str = Depends(oauth)):
     if not token:
         raise HTTPException(status_code=401, detail="Token not found")
 
-    user_service_url = "http://127.0.0.1:8000/users/me"
+    user_service_url = f"http://{USER_SERVICE_HOST}/users/me"
     headers = {"Authorization": f"Bearer {token}"}
 
     async with httpx.AsyncClient() as client:
