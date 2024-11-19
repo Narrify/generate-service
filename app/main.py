@@ -12,6 +12,8 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.clients.mongo import get_dialogs, get_stories, insert_track
 from app.routes import generate
+
+from app.utils.log import log
 from app.utils.external import validate
 
 app = FastAPI(
@@ -61,13 +63,6 @@ class CounterMiddleware(BaseHTTPMiddleware):
 
         return response
 
-    def useless_method(self):
-        """
-        Use this method to test the code analysis.
-        """
-
-        return self
-
 
 app.add_middleware(
     CounterMiddleware
@@ -85,8 +80,17 @@ async def hello_world():
     return "Hello World"
 
 
+@app.get("/id")
+def id():
+    """
+    Get the log stream id.
+    """
+
+    return f"g/{log.today}/{log.id}"
+
+
 @app.get("/metrics")
-async def get_metrics():
+def metrics():
     """
     Get the metrics for the API.
     """

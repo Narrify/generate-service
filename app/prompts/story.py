@@ -26,6 +26,7 @@ def get_story_content():
     return system_content
 
 
+# TODO:
 def generate_story_prompt(entry: dict):
     """
     Generates a prompt for the dialog model based on the given entry.
