@@ -15,3 +15,5 @@ def format_characters(prompt: str, entry: dict):
             prompt += f"{str(attribute['value']).lower()},"
 
         prompt = prompt[:-1] + ");"
+
+    return prompt

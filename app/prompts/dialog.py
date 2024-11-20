@@ -37,6 +37,6 @@ def generate_dialog_prompt(entry: dict):
 
     prompt += "characters="
 
-    format_characters(prompt, entry)
+    prompt = format_characters(prompt, entry)
 
     return prompt

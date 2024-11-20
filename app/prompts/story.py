@@ -41,6 +41,6 @@ def generate_story_prompt(entry: dict):
     prompt = prompt[:-1] + "|"
     prompt += "characters="
 
-    format_characters(prompt, entry)
+    prompt = format_characters(prompt, entry)
 
     return prompt
