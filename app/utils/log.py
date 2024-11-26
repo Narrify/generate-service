@@ -1,3 +1,5 @@
+from os import getenv
+
 from time import time
 from enum import Enum
 from uuid import uuid4
@@ -6,7 +8,7 @@ from json import dumps
 from logging import getLogger
 from datetime import datetime
 
-from boto3 import client
+from boto3 import Session
 from botocore.exceptions import ClientError, NoCredentialsError, PartialCredentialsError
 
 
@@ -45,6 +47,13 @@ class Log:
         if not hasattr(self, '_init_'):
             self.logger = getLogger("uvicorn")
 
+            self.aws_access_key_id = getenv('AWS_ACCESS_KEY_ID')
+            self.aws_secret_access_key = getenv('AWS_SECRET_ACCESS_KEY')
+            self.aws_session_token = getenv('AWS_SESSION_TOKEN')
+            self.aws_region = 'us-east-1'
+
+            self.session = None
+
             self.cloud_watch = None
             self.cloud_watch_group = "narrify"
 
@@ -56,7 +65,14 @@ class Log:
 
     def _check_aws_credentials(self):
         try:
-            sts_client = client('sts')
+            self.session = Session(
+                aws_access_key_id=self.aws_access_key_id,
+                aws_secret_access_key=self.aws_secret_access_key,
+                aws_session_token=self.aws_session_token,
+                region_name=self.aws_region
+            )
+
+            sts_client = self.session.client('sts')
             identity = sts_client.get_caller_identity()
 
             self.logger.info(f"AWS Ready: {identity['Account']}")
@@ -77,7 +93,7 @@ class Log:
             return
 
         try:
-            self.cloud_watch = client('logs')
+            self.cloud_watch = self.session.client('logs')
 
             try:
                 self.cloud_watch.create_log_group(logGroupName=self.cloud_watch_group)
