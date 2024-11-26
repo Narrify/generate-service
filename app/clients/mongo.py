@@ -1,7 +1,7 @@
 """
 This module contains the functions to interact with the MongoDB database.
 """
-
+from os import getenv
 from time import time
 from uuid import uuid4
 
@@ -10,7 +10,9 @@ from pymongo.errors import PyMongoError
 
 from app.utils.log import Stream, log
 
-client = MongoClient("mongodb://localhost:27017/")
+MONGO_URI = getenv("MONGO_URI")
+
+client = MongoClient(MONGO_URI)
 
 try:
     client.server_info()
